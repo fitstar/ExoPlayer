@@ -74,10 +74,10 @@ android.libraryVariants.all { variant ->
 
 publish {
     repoName = 'exoplayer'
-    userOrg = 'google'
-    groupId = 'com.google.android.exoplayer'
+    userOrg = 'fitstar'
+    groupId = 'com.fitstar.exoplayer'
     artifactId = 'exoplayer'
     version = 'r1.5.3'
     description = 'The ExoPlayer library.'
-    website = 'https://github.com/google/ExoPlayer'
+    website = 'https://github.com/fitstar/ExoPlayer'
 }
