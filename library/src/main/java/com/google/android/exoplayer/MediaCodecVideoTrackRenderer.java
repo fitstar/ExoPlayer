@@ -192,8 +192,43 @@ public class MediaCodecVideoTrackRenderer extends MediaCodecTrackRenderer {
       long allowedJoiningTimeMs, DrmSessionManager drmSessionManager,
       boolean playClearSamplesWithoutKeys, Handler eventHandler, EventListener eventListener,
       int maxDroppedFrameCountToNotify) {
+    this(context, source, videoScalingMode, allowedJoiningTimeMs, drmSessionManager, playClearSamplesWithoutKeys,
+        eventHandler, eventListener, maxDroppedFrameCountToNotify, true);
+  }
+
+  /**
+   * @param context A context.
+   * @param source The upstream source from which the renderer obtains samples.
+   * @param videoScalingMode The scaling mode to pass to
+   *     {@link MediaCodec#setVideoScalingMode(int)}.
+   * @param allowedJoiningTimeMs The maximum duration in milliseconds for which this video renderer
+   *     can attempt to seamlessly join an ongoing playback.
+   * @param drmSessionManager For use with encrypted content. May be null if support for encrypted
+   *     content is not required.
+   * @param playClearSamplesWithoutKeys Encrypted media may contain clear (un-encrypted) regions.
+   *     For example a media file may start with a short clear region so as to allow playback to
+   *     begin in parallel with key acquisision. This parameter specifies whether the renderer is
+   *     permitted to play clear regions of encrypted media files before {@code drmSessionManager}
+   *     has obtained the keys necessary to decrypt encrypted regions of the media.
+   * @param eventHandler A handler to use when delivering events to {@code eventListener}. May be
+   *     null if delivery of events is not required.
+   * @param eventListener A listener of events. May be null if delivery of events is not required.
+   * @param maxDroppedFrameCountToNotify The maximum number of frames that can be dropped between
+   *     invocations of {@link EventListener#onDroppedFrames(int, long)}.
+   * @param useDefaultDisplayVsync This parameter specifies whether the adjusting frame release
+   *     timestamps for a smoother visual result will also snap release to the default display's
+   *     vsync signal.
+   */
+  public MediaCodecVideoTrackRenderer(Context context, SampleSource source, int videoScalingMode,
+                                      long allowedJoiningTimeMs, DrmSessionManager drmSessionManager,
+                                      boolean playClearSamplesWithoutKeys, Handler eventHandler, EventListener eventListener,
+                                      int maxDroppedFrameCountToNotify, boolean useDefaultDisplayVsync) {
     super(source, drmSessionManager, playClearSamplesWithoutKeys, eventHandler, eventListener);
-    this.frameReleaseTimeHelper = new VideoFrameReleaseTimeHelper(context);
+    if (useDefaultDisplayVsync) {
+      this.frameReleaseTimeHelper = new VideoFrameReleaseTimeHelper(context);
+    } else {
+      this.frameReleaseTimeHelper = new VideoFrameReleaseTimeHelper();
+    }
     this.videoScalingMode = videoScalingMode;
     this.allowedJoiningTimeUs = allowedJoiningTimeMs * 1000;
     this.eventListener = eventListener;
